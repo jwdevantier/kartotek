@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+
+
+<Button contentDisplay="RIGHT" mnemonicParsing="false" prefHeight="25.0" styleClass="tag-button" stylesheets="@tagbtn.css" text="Rust" textAlignment="RIGHT" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <graphic>
+      <Label text="×" textFill="#757575" />
+   </graphic>
+   <padding>
+      <Insets bottom="6.0" left="6.0" right="6.0" top="6.0" />
+   </padding>
+</Button>

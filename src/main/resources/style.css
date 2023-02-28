@@ -1,0 +1,51 @@
+/* limit max width of tab pane */
+.tab-label {
+    -fx-pref-width: 150px;
+}
+
+.search_field_error {
+    -fx-text-box-border: red;
+    -fx-focus-color: red;
+    -fx-text-fill: red;
+}
+
+.editor_bold {
+    -fx-fill: purple;
+    -fx-font-weight: bold;
+}
+
+.editor_emph {
+    -fx-font-style: italic;
+    -fx-fill: red;
+}
+
+.editor_underline {
+    -fx-underline: true;
+    -fx-fill: green;
+}
+
+.editor_code_inline {
+    -fx-fill: #303030;
+    -fx-font-family: 'Menlo';
+    -rtfx-background-color: ghostwhite;
+}
+
+.editor_code_block {
+    -fx-font-family: 'Menlo';
+    -fx-fill: #303030;
+}
+
+.editor_header {
+    -fx-font-size: 12pt;
+    -fx-underline: true;
+    -fx-font-weight: bold;
+}
+
+.editor_link {
+    -fx-fill: blue;
+    -fx-cursor: hand;
+}
+
+.editor_link:hover {
+    -fx-fill: darkorchid;
+}
