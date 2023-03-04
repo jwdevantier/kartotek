@@ -21,6 +21,7 @@ public class KartotekApp extends Application {
         KeyCombination kbNewNote = new KeyCodeCombination(KeyCode.N, KeyCombination.SHORTCUT_DOWN);
         KeyCombination kbTabClose = new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
         KeyCombination kbSearch = new KeyCodeCombination(KeyCode.SLASH, KeyCombination.SHORTCUT_DOWN);
+        KeyCombination kbRename = new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN);
         scene.addEventHandler(KeyEvent.KEY_RELEASED, new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
@@ -30,6 +31,8 @@ public class KartotekApp extends Application {
                     ctrl.onTabClose();
                 } else if (kbSearch.match(keyEvent)) {
                     ctrl.onSearch();
+                } else if (kbRename.match(keyEvent)) {
+                    ctrl.onRename();
                 }
             }
         });

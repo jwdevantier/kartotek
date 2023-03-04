@@ -260,6 +260,17 @@ public class KartotekController {
         closeTab(tab);
     }
 
+    public void onRename() {
+        int ndx = lstNotes.getSelectionModel().getSelectedIndex();
+        if (ndx == -1) {
+            return;
+        }
+        lstNotes.setEditable(true);
+        // TODO: error, cannot abort edit and trigger again, second time nothing happens, handler is called.
+        lstNotes.edit(ndx);
+        lstNotes.setEditable(false);
+    }
+
     public void onSearch() {
         txtSearch.requestFocus();
     }
