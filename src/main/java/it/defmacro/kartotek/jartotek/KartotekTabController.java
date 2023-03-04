@@ -87,7 +87,7 @@ public class KartotekTabController {
     }
 
     protected void addTagButton(Note note, String tag) {
-        FXMLLoader fxmlLoader = new FXMLLoader(Kartotek.class.getResource("tagbtn.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(KartotekApp.class.getResource("tagbtn.fxml"));
         try {
             Button btn = fxmlLoader.load();
             btn.setText(tag);

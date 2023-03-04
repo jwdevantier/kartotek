@@ -98,7 +98,7 @@ public class KartotekController {
 
     protected Tab initNewTab(KartotekTabController tabCtrl) {
         Tab tab = new Tab();
-        FXMLLoader fxmlLoader = new FXMLLoader(Kartotek.class.getResource("EditorPane.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(KartotekApp.class.getResource("EditorPane.fxml"));
         fxmlLoader.setController(tabCtrl);
         try {
             tab.setContent(fxmlLoader.load());

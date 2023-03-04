@@ -7,10 +7,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class Kartotek extends Application {
+public class KartotekApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Kartotek.class.getResource("KartotekApp.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(KartotekApp.class.getResource("KartotekApp.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         KartotekController ctrl = fxmlLoader.getController();
         stage.setOnCloseRequest(event -> {
