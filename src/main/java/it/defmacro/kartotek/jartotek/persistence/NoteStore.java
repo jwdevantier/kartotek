@@ -5,6 +5,8 @@ import it.defmacro.kartotek.jartotek.util.FUtils;
 import it.defmacro.kartotek.jartotek.util.Strings;
 import it.defmacro.kartotek.jartotek.util.Timestamp;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 
 import java.io.IOException;
@@ -17,16 +19,16 @@ import java.util.stream.Stream;
 
 public class NoteStore {
     protected Path note_dir;
+    protected boolean _loaded = false;
 
-    public ObservableMap<String, Note> getNotes() {
-        return notes;
-    }
+    protected ObservableList<Note> _notesList = FXCollections.observableArrayList();
+    protected ObservableMap<String, Note> _notesMap = FXCollections.observableHashMap();
 
-    // primary data-structure,
-    // holds notes indexed by their (stringified) timestamp.
-    protected ObservableMap<String, Note> notes = FXCollections.observableHashMap();
+    public void initialize() {
+        if (_loaded) {
+            throw new RuntimeException("cannot initialize store twice");
+        }
 
-    protected void initLoadNotes() {
         Stream.of(Objects.requireNonNull(this.note_dir.toFile().listFiles()))
                 .filter(file -> {
                     if (file.isDirectory()) {
@@ -50,8 +52,14 @@ public class NoteStore {
                 })
                 .filter(Objects::nonNull)
                 .forEach(note -> {
-                    notes.put(Timestamp.serialize(note.ts.get()), note);
+                    _notesList.add(note);
                 });
+        _loaded = true;
+    }
+
+    protected String noteMapKey(Note note) {
+        // generate from the note the key used for indexing into _notesMap
+        return Timestamp.serialize(note.ts.get());
     }
 
     protected boolean _saveNote(Note note, String contents) {
@@ -89,21 +97,29 @@ public class NoteStore {
         }
 
         if (!note.getDiskKey().get().equals(note.getNoteKey())) {
-            res = deleteNote(note);
+            res = _deleteNote(note, false);
             note.updateDiskKey();
         }
 
         return res;
     }
 
-    public boolean deleteNote(Note note) {
+    protected boolean _deleteNote(Note note, boolean unlink) {
         Optional<String> diskKey = note.getDiskKey();
         if (diskKey.isEmpty()) {
             return true;
         }
         Path contentPath = note_dir.resolve(String.format("%s.md", diskKey.get()));
         Path metaPath = note_dir.resolve(String.format("%s.meta.json", diskKey.get()));
-        return metaPath.toFile().delete() && contentPath.toFile().delete();
+        boolean ret = metaPath.toFile().delete() && contentPath.toFile().delete();
+        if (ret && unlink) {
+            _notesList.removeAll(note);
+        }
+        return ret;
+    }
+
+    public boolean deleteNote(Note note) {
+        return _deleteNote(note, true);
     }
 
     public String nodeContents(Note note) throws IOException {
@@ -125,8 +141,17 @@ public class NoteStore {
         note.ts.set(LocalDateTime.now());
         note.title.set("<untitled>");
         note.tags.set(FXCollections.observableArrayList());
-        notes.put(Timestamp.serialize(note.ts.get()), note);
+        //notes.put(Timestamp.serialize(note.ts.get()), note);
+        _notesList.add(note);
         return note;
+    }
+
+    public Optional<Note> getByKey(String key) {
+        return Optional.ofNullable(_notesMap.get(key));
+    }
+
+    public ObservableList<Note> getNotesList() {
+        return _notesList;
     }
 
     public NoteStore(Path note_dir) throws NoteDirException {
@@ -139,6 +164,18 @@ public class NoteStore {
         } else if (!note_dir.toFile().isDirectory()) {
             throw new NoteDirException(note_dir, "path at note_dir is not a directory");
         }
-        initLoadNotes();
+        _notesList.addListener((ListChangeListener<Note>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Note note : change.getAddedSubList()) {
+                        _notesMap.put(noteMapKey(note), note);
+                    }
+                } else if (change.wasRemoved()) {
+                    for (Note note : change.getRemoved()) {
+                        _notesMap.remove(noteMapKey(note));
+                    }
+                }
+            }
+        });
     }
 }

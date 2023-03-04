@@ -136,10 +136,11 @@ public class KartotekTabController {
             }
             return true;
         }
-        Note n = store.getNotes().get(href);
-        if (n != null) {
+        // if `href` is really a key for a local note
+        Optional<Note> n = store.getByKey(href);
+        if (n.isPresent()) {
             if (_loadNote != null) {
-                _loadNote.call(n);
+                _loadNote.call(n.get());
             }
             return true;
         }

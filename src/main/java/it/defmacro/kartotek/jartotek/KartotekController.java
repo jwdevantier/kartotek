@@ -11,7 +11,6 @@ import it.defmacro.kartotek.jartotek.settings.Settings;
 import it.defmacro.kartotek.jartotek.settings.SettingsReader;
 import it.defmacro.kartotek.jartotek.ui.NoteListCell;
 import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
@@ -27,8 +26,8 @@ import java.util.*;
 
 public class KartotekController {
     protected Settings _settings = null;
-    ObservableList<Note> lstNotesData = FXCollections.observableArrayList();
-    FilteredList<Note> lstNotesDataFilter = new FilteredList<>(lstNotesData);
+    ObservableList<Note> lstNotesData;
+    FilteredList<Note> lstNotesDataFilter;
     @FXML
     ListView<Note> lstNotes = new ListView<>();
     @FXML
@@ -39,7 +38,7 @@ public class KartotekController {
     Map<Tab, KartotekTabController> tab2Ctrl = new HashMap<>();
     protected NoteStore store;
 
-    protected void initLoadNotes(Path note_dir) {
+    protected void mkNoteStore(Path note_dir) {
         try {
             store = new NoteStore(note_dir);
         } catch( NoteDirException e) {
@@ -131,6 +130,19 @@ public class KartotekController {
             System.exit(1);
         }
 
+        // small hack.
+        // Using a FilteredList to wrap the NoteStore's ObservableList I encountered
+        // an issue where a ListViewEditEvent (edit commit) was fired which ultimately
+        // would try to call .set(ndx, <note>) on the filteredlist, raising an
+        // UnsupportedOperationException. This event override replaces the default handler
+        // and clears selection to get the cell re-drawn in read-mode again.
+        lstNotes.setOnEditCommit(new EventHandler<ListView.EditEvent<Note>>() {
+            @Override
+            public void handle(ListView.EditEvent<Note> event) {
+                lstNotes.getSelectionModel().clearSelection();
+            }
+        });
+
         lstNotes.setCellFactory(new Callback<>() {
             @Override
             public ListCell<Note> call(ListView<Note> noteListView) {
@@ -142,7 +154,6 @@ public class KartotekController {
                 deleteItem.textProperty().set("Delete note");
                 deleteItem.setOnAction(event -> {
                     store.deleteNote(cell.getItem());
-                    lstNotes.getItems().remove(cell.getItem());
                 });
 
                 MenuItem renameItem = new MenuItem();
@@ -188,23 +199,15 @@ public class KartotekController {
                     System.err.println("tab not found!?");
                     return;
                 }
-                System.out.println("NOTE COMMIT");
                 tab2Ctrl.get(tab.get()).saveNote();
+                objectEditEvent.consume();
             }
         });
-        initLoadNotes(_settings.getNotesDir());
-        store.getNotes().addListener( (MapChangeListener<String, Note>) change -> {
-            if (change.wasRemoved()) {
-                System.out.printf("note removed: %s", change.getValueRemoved().title.get());
-                lstNotes.getItems().removeAll(change.getValueRemoved());
-            }
-            if (change.wasAdded()) {
-                System.out.printf("note added: %s", change.getValueAdded().title.get());
-                lstNotes.getItems().add(change.getValueAdded());
-            }
-        });
+        mkNoteStore(_settings.getNotesDir());
+        store.initialize();
+        lstNotesData = store.getNotesList();
+        lstNotesDataFilter = new FilteredList<>(lstNotesData);
         lstNotes.setItems(lstNotesDataFilter);
-        lstNotesData.setAll(store.getNotes().values());
 
         lstNotes.getSelectionModel().selectedItemProperty().addListener((obs, then, now) -> {
             if (now == null) {
@@ -241,7 +244,7 @@ public class KartotekController {
 
     public void onNewNote() {
         Note n = store.createNote();
-        int ndx = lstNotes.getItems().indexOf(n);
+        int ndx = lstNotesData.indexOf(n);
         if (ndx == -1) {
             throw new RuntimeException("note not found in list - should have been added");
         }
