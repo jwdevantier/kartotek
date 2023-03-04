@@ -23,7 +23,6 @@ import javafx.util.Callback;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class KartotekController {
@@ -131,6 +130,7 @@ public class KartotekController {
             System.out.println(e);
             System.exit(1);
         }
+
         lstNotes.setCellFactory(new Callback<>() {
             @Override
             public ListCell<Note> call(ListView<Note> noteListView) {
