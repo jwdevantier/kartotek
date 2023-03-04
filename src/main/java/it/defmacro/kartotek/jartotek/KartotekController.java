@@ -160,16 +160,7 @@ public class KartotekController {
                 MenuItem newItem = new MenuItem();
                 newItem.textProperty().set("New note");
                 newItem.setOnAction(event -> {
-                    Note n = store.createNote();
-                    int ndx = lstNotes.getItems().indexOf(n);
-                    if (ndx == -1) {
-                        throw new RuntimeException("note not found in list - should have been added");
-                    }
-                    lstNotes.getSelectionModel().select(ndx);
-                    lstNotes.scrollTo(ndx);
-                    // TODO: trigger edit of title also.
-                    //       ATM - calling cell.startEdit() seems to crash with
-                    //             Note == null
+                    onNewNote();
                 });
 
                 ctxMenu.getItems().addAll(deleteItem);
@@ -248,6 +239,38 @@ public class KartotekController {
         });
     }
 
+    public void onNewNote() {
+        Note n = store.createNote();
+        int ndx = lstNotes.getItems().indexOf(n);
+        if (ndx == -1) {
+            throw new RuntimeException("note not found in list - should have been added");
+        }
+        lstNotes.getSelectionModel().select(ndx);
+        lstNotes.scrollTo(ndx);
+    }
+
+    public void onTabClose() {
+        Tab tab = editorTabs.getSelectionModel().getSelectedItem();
+        if (tab == null) {
+            return;
+        }
+        closeTab(tab);
+    }
+
+    public void onSearch() {
+        txtSearch.requestFocus();
+    }
+
+    protected void closeTab(Tab tab) {
+        Event closeRequestEvent = new Event(tab, tab, Tab.TAB_CLOSE_REQUEST_EVENT);
+        Event.fireEvent(tab, closeRequestEvent);
+
+        tab.getTabPane().getTabs().remove(tab);
+
+        Event closedEvent = new Event(tab, tab, Tab.CLOSED_EVENT);
+        Event.fireEvent(tab, closedEvent);
+    }
+
     public void quit() {
         // On application close, trigger the tab close AND the
         // pre- (close request) and post- (closed event) tab close events.
@@ -256,13 +279,7 @@ public class KartotekController {
         // whose contents have changed.
         Tab[] tabArray = editorTabs.getTabs().toArray(new Tab[0]);
         for (Tab tab : tabArray) {
-            Event closeRequestEvent = new Event(tab, tab, Tab.TAB_CLOSE_REQUEST_EVENT);
-            Event.fireEvent(tab, closeRequestEvent);
-
-            tab.getTabPane().getTabs().remove(tab);
-
-            Event closedEvent = new Event(tab, tab, Tab.CLOSED_EVENT);
-            Event.fireEvent(tab, closedEvent);
+            closeTab(tab);
         }
     }
 }
