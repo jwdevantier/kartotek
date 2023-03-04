@@ -6,6 +6,9 @@ import it.defmacro.kartotek.jartotek.persistence.NoteStore;
 import it.defmacro.kartotek.jartotek.search.AllExpr;
 import it.defmacro.kartotek.jartotek.search.Expression;
 import it.defmacro.kartotek.jartotek.search.SearchParser;
+import it.defmacro.kartotek.jartotek.settings.MissingConfException;
+import it.defmacro.kartotek.jartotek.settings.Settings;
+import it.defmacro.kartotek.jartotek.settings.SettingsReader;
 import it.defmacro.kartotek.jartotek.ui.NoteListCell;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -24,7 +27,7 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class KartotekController {
-    protected static Path NOTE_DIR = Paths.get("/Users/pseud/Documents/tmp-notes");
+    protected Settings _settings = null;
     ObservableList<Note> lstNotesData = FXCollections.observableArrayList();
     FilteredList<Note> lstNotesDataFilter = new FilteredList<>(lstNotesData);
     @FXML
@@ -118,6 +121,16 @@ public class KartotekController {
     }
 
     public void initialize() {
+        try {
+            _settings = SettingsReader.read();
+        } catch (IOException e) {
+            System.out.println("failed to read config");
+            System.exit(1);
+
+        } catch (MissingConfException e) {
+            System.out.println(e);
+            System.exit(1);
+        }
         lstNotes.setCellFactory(new Callback<>() {
             @Override
             public ListCell<Note> call(ListView<Note> noteListView) {
@@ -188,7 +201,7 @@ public class KartotekController {
                 tab2Ctrl.get(tab.get()).saveNote();
             }
         });
-        initLoadNotes(NOTE_DIR);
+        initLoadNotes(_settings.getNotesDir());
         store.getNotes().addListener( (MapChangeListener<String, Note>) change -> {
             if (change.wasRemoved()) {
                 System.out.printf("note removed: %s", change.getValueRemoved().title.get());
