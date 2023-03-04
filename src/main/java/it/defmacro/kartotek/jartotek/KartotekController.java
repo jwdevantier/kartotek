@@ -211,24 +211,25 @@ public class KartotekController {
 
         txtSearch.textProperty().addListener( obs -> {
             String query = txtSearch.getText();
+            ObservableList<String> styles = txtSearch.getStyleClass();
             if (query == null || query.length() == 0) {
                 lstNotesDataFilter.setPredicate(n -> true);
+                if (styles.contains("search_field_error")) {
+                    styles.removeAll(Collections.singleton("search_field_error"));
+                }
             } else {
-                ObservableList<String> styles = txtSearch.getStyleClass();
                 try {
                     List<Expression> exprs = SearchParser.initParser(query).parseProgram();
-                    styles.removeAll(Collections.singleton("search_field_error"));
                     lstNotesDataFilter.setPredicate((new AllExpr(exprs))::eval);
-                    // TODO fill in here, then set eval fn as predicate
-                    System.out.println("done");
+                    if (styles.contains("search_field_error")) {
+                        styles.removeAll(Collections.singleton("search_field_error"));
+                    }
                 } catch (Exception e) {
                     if (query.trim().length() != 0) {
                         if (!styles.contains("search_field_error")) {
                             styles.add("search_field_error");
                         }
                     }
-                    lstNotesDataFilter.setPredicate(n -> false);
-                    System.out.println("query exc caught, ignoring.");
                 }
             }
         });
