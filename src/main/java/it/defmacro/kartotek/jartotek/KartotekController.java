@@ -18,9 +18,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.util.Callback;
+import org.reactfx.EventStreams;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.*;
 
 public class KartotekController {
@@ -32,6 +34,9 @@ public class KartotekController {
     @FXML
     TextField txtSearch = new TextField();
     @FXML TabPane editorTabs = new TabPane();
+
+    @FXML Label statusLeft = new Label();
+    @FXML Label statusRight = new Label();
 
 
     Map<Tab, KartotekTabController> tab2Ctrl = new HashMap<>();
@@ -128,6 +133,18 @@ public class KartotekController {
             System.out.println(e);
             System.exit(1);
         }
+
+        // Configure status left/right fields to auto-clear some seconds after being set
+        EventStreams.valuesOf(statusLeft.textProperty())
+                .filter(s -> !s.equals(""))
+                .successionEnds(Duration.ofMillis(4000))
+                .retainLatestUntilLater()
+                .subscribe(s -> statusLeft.setText(""));
+        EventStreams.valuesOf(statusRight.textProperty())
+                .filter(s -> !s.equals(""))
+                .successionEnds(Duration.ofMillis(4000))
+                .retainLatestUntilLater()
+                .subscribe(s -> statusRight.setText(""));
 
         lstNotes.setOnEditCommit(event -> {
             // https://openjfx.io/javadoc/19/javafx.controls/javafx/scene/control/ListView.html#edit(int)
