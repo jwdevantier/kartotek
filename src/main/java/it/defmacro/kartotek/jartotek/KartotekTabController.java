@@ -156,7 +156,6 @@ public class KartotekTabController {
         //editor.setStyle("-fx-font-family: 'Lucida Grande'; -fx-font-size: 10pt;");
         // TODO: some fonts won't actually render bold etc, have to pick the magic font.
         editor.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 10pt");
-        editor.setWrapText(true);
         executor = Executors.newSingleThreadExecutor();
         listenNoteChanges(true);
 
