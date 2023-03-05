@@ -10,7 +10,7 @@ import java.util.List;
 public class NoteParserTest {
     static void ppStyleRanges(String input, List<StyleRange> styles) {
         for (StyleRange sr : styles) {
-            System.out.printf("%s [%d;%d[: %s\n", sr.type().toString(), sr.start(), sr.end(), input.substring(sr.start(), sr.end()));
+            System.out.printf("%s [%d;%d[: %s\n", sr.type(), sr.start(), sr.end(), input.substring(sr.start(), sr.end()));
         }
     }
 
