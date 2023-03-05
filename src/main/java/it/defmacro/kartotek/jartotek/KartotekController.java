@@ -10,7 +10,6 @@ import it.defmacro.kartotek.jartotek.settings.MissingConfException;
 import it.defmacro.kartotek.jartotek.settings.Settings;
 import it.defmacro.kartotek.jartotek.settings.SettingsReader;
 import it.defmacro.kartotek.jartotek.ui.NoteListCell;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
