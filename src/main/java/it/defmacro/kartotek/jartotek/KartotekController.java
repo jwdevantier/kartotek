@@ -129,17 +129,21 @@ public class KartotekController {
             System.exit(1);
         }
 
-        // small hack.
-        // Using a FilteredList to wrap the NoteStore's ObservableList I encountered
-        // an issue where a ListViewEditEvent (edit commit) was fired which ultimately
-        // would try to call .set(ndx, <note>) on the filteredlist, raising an
-        // UnsupportedOperationException. This event override replaces the default handler
-        // and clears selection to get the cell re-drawn in read-mode again.
-        lstNotes.setOnEditCommit(new EventHandler<ListView.EditEvent<Note>>() {
-            @Override
-            public void handle(ListView.EditEvent<Note> event) {
-                lstNotes.getSelectionModel().clearSelection();
-            }
+        lstNotes.setOnEditCommit(event -> {
+            // https://openjfx.io/javadoc/19/javafx.controls/javafx/scene/control/ListView.html#edit(int)
+            // (Editing section) - set this handler to prevent an attempt to override the item in the list.
+            // This would trigger an error as a FilteredList does not support this.
+            //
+            // Secondly, we work to disable the edit selection (getEditingIndex() to read, edit() to set)
+            // by setting the edit selection to -1 (unset) before disabling the ability to edit the list again.
+            lstNotes.edit(-1);
+            lstNotes.setEditable(false);
+            // edit cancel retains focus, commit loses it, request focus to maintain it.
+            lstNotes.requestFocus();
+        });
+        lstNotes.setOnEditCancel(noteEditEvent -> {
+            lstNotes.edit(-1);
+            lstNotes.setEditable(false);
         });
 
         lstNotes.setCellFactory(new Callback<>() {
@@ -164,7 +168,6 @@ public class KartotekController {
                     // as we are triggering the cell to be edited.
                     lstNotes.setEditable(true);
                     cell.startEdit();
-                    lstNotes.setEditable(false);
                 });
 
                 MenuItem newItem = new MenuItem();
@@ -261,13 +264,12 @@ public class KartotekController {
 
     public void onRename() {
         int ndx = lstNotes.getSelectionModel().getSelectedIndex();
+        ndx = lstNotesDataFilter.getSourceIndex(ndx);
         if (ndx == -1) {
             return;
         }
         lstNotes.setEditable(true);
-        // TODO: error, cannot abort edit and trigger again, second time nothing happens, handler is called.
         lstNotes.edit(ndx);
-        lstNotes.setEditable(false);
     }
 
     public void onSearch() {
