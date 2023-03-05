@@ -46,8 +46,9 @@ public class KartotekTabController {
     protected boolean isClickingLink = false;
     protected boolean isPinned = false;
     protected NoteLoadCallback _loadNote;
+    protected StatusCallback _setStatus;
 
-    public KartotekTabController(NoteStore store, Note note, NoteLoadCallback cb) {
+    public KartotekTabController(NoteStore store, Note note, NoteLoadCallback ncb, StatusCallback scb) {
         if (store == null) {
             throw new IllegalArgumentException("store cannot be null");
         }
@@ -56,7 +57,8 @@ public class KartotekTabController {
         }
         this.store = store;
         this.note = note;
-        this._loadNote = cb;
+        this._loadNote = ncb;
+        this._setStatus = scb;
         this.links = new ArrayList<>();
     }
 
@@ -124,14 +126,14 @@ public class KartotekTabController {
                 .subscribe(this::applyHighlighting);
     }
 
-    protected boolean openLink(String href){
+    protected boolean openLink(String href) {
         String href_lower = href.toLowerCase();
         if (href_lower.startsWith("http") || href_lower.startsWith("www")) {
             ProcessBuilder pb = new ProcessBuilder("open", href);
             try {
                 pb.start();
-                System.out.println("started");
             } catch (IOException e) {
+                _setStatus.call("Failed to open external link", true);
                 System.out.println(e.toString());
             }
             return true;
@@ -245,7 +247,7 @@ public class KartotekTabController {
             ComputedStyle cs = computeHighlighting();
             applyHighlighting(cs);
         } catch (IOException e) {
-            System.out.println("failed to load note");
+            _setStatus.call("Failed to load note", true);
             System.out.println(e);
         } finally {
             listenNoteChanges(true);
@@ -266,7 +268,7 @@ public class KartotekTabController {
         }
         if (isDirty()) {
             if (!this.saveNote()) {
-                // TODO: log failure to save ..?
+                _setStatus.call("Failed to save note", true);
                 return;  // abort loading new note.
             }
         }

@@ -17,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import org.reactfx.EventStreams;
 
@@ -86,7 +87,7 @@ public class KartotekController {
             }
         }
         if (tmpTab == null) {
-            KartotekTabController tabCtrl = new KartotekTabController(store, note, this::loadNote);
+            KartotekTabController tabCtrl = new KartotekTabController(store, note, this::loadNote, this::setStatus);
             tmpTab = initNewTab(tabCtrl);
             tab2Ctrl.put(tmpTab, tabCtrl);
             editorTabs.getTabs().add(tmpTab);
@@ -96,6 +97,15 @@ public class KartotekController {
         }
         tmpTab.textProperty().bind(note.title);
         editorTabs.getSelectionModel().select(tmpTab);
+    }
+
+    protected void setStatus(String text, boolean error) {
+        statusRight.setText(text);
+        if (error) {
+            statusRight.setTextFill(Color.rgb(255, 0 , 0));
+        } else {
+            statusRight.setTextFill(Color.rgb(0x9f, 0x9f, 0x9f));
+        }
     }
 
     protected Tab initNewTab(KartotekTabController tabCtrl) {

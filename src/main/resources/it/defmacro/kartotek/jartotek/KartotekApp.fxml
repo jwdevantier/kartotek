@@ -19,7 +19,7 @@
          <VBox.margin>
             <Insets />
          </VBox.margin></TextField>
-    <SplitPane dividerPositions="0.2505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.36080178173719374" focusTraversable="true" prefHeight="555.0" prefWidth="930.0" VBox.vgrow="ALWAYS">
       <items>
         <AnchorPane>
           <children>
