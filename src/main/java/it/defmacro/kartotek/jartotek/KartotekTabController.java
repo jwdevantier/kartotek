@@ -157,7 +157,7 @@ public class KartotekTabController {
         // TODO: some fonts won't actually render bold etc, have to pick the magic font.
         editor.setStyle("-fx-font-family: 'Arial'; -fx-font-size: 10pt");
         editor.setWrapText(true);
-        executor = Executors.newSingleThreadExecutor(); /* TODO: call executor.stop() when closing tab */
+        executor = Executors.newSingleThreadExecutor();
         listenNoteChanges(true);
 
         editor.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
