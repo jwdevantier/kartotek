@@ -14,3 +14,8 @@ clean:  ## clean build directory
 jar: ## build fat jar
 	mvn package
 
+
+.PHONY: list-deps
+list-deps:  # view project dependencies as a tree
+	mvn dependency:tree
+
