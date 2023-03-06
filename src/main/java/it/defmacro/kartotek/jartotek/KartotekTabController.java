@@ -3,6 +3,7 @@ package it.defmacro.kartotek.jartotek;
 import it.defmacro.kartotek.jartotek.model.Note;
 import it.defmacro.kartotek.jartotek.persistence.NoteStore;
 import it.defmacro.kartotek.jartotek.ui.NoteLoadCallback;
+import it.defmacro.kartotek.jartotek.ui.StatusCallback;
 import it.defmacro.kartotek.jartotek.util.Checksum;
 import it.defmacro.kartotek.jartotek.util.LinkStyleRange;
 import it.defmacro.kartotek.jartotek.util.NoteParser;
