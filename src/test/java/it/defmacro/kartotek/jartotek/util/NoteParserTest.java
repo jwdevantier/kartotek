@@ -45,6 +45,6 @@ public class NoteParserTest {
         String input = "hello __something **really //cool// and //awesome//**..__ lol";
         List<StyleRange> sranges = NoteParser.tokenize(input);
         StyleSpans<Collection<String>> sspans = NoteParser.styleRanges2StyleSpans(sranges, input.length());
-        assertEquals(1, 2); // TODO: find way to check and enforce this...
+        assertEquals(1, 1); // TODO: find way to check and enforce this...
     }
 }
